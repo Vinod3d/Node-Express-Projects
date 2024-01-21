@@ -74,12 +74,18 @@ class UserController {
                 res.send({"status" : "failed", "message" : "New Password and Confirm New Password doesn't match"})
             } else{
                 const salt = await bcrypt.genSalt(10)
-                const hashedPassword = await bcrypt.hash(password, salt)
+                const newHashedPassword = await bcrypt.hash(password, salt)
+                await UserModel.findByIdAndUpdate(req.user._id, {$set : {password: newHashedPassword}})
                 res.send({"status" : "success", "message" : "Password changed succesfully"})
             }
         } else{
             res.send({"status" : "failed", "message" : "All Fields are Required"})
         }
+    }
+
+
+    static loggedUser = async (req, res)=>{
+        res.send({"user" : req.user})
     }
 }
 
