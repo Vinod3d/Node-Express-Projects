@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class=" p-12">
+        <div class="flex justify-between">
+            <div class="flex gap-5">
+                <div class="w-20 h-20  rounded-md overflow-hidden">
+                    <img class="w-full object-top h-full object-cover" src="/images/uploads/<%= user.profilepic %>" alt="profilepic">
+                </div>
+                <div>
+                    <h2 class="text-3xl mb-5">Hello, <%= user.name %>
+                    </h2>
+                    <h5>you can create a post.</h5>
+                </div>
+            </div>
+            <div>
+                <a href="/logout"
+                    class="hover:shadow-form rounded-md bg-[red] py-3 px-8 text-base font-semibold text-white outline-none">Logout</a>
+            </div>
+        </div>
+        <div class="flex items-center justify-center p-12">
+            <div class="mx-auto w-full max-w-[550px]">
+                <h3 class="text-center text-2xl text-[#6A64F1] font-extrabold">Create a Post</h3>
+                <form action="/post" method="POST">
+                    <div class="mb-5">
+                        <label for="post-title" class="mb-3 block text-base font-medium text-[#07074D]">
+                            Post Title
+                        </label>
+                        <input type="text" name="title" id="post-title" placeholder="Enter your post title"
+                            autocomplete="off"
+                            class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="post-content" class="mb-3 block text-base font-medium text-[#07074D]">
+                            Post Content
+                        </label>
+                        <textarea name="content" id="post-content" rows="5" placeholder="Write your post content here"
+                            autocomplete="off"
+                            class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"></textarea>
+                    </div>
+
+                    <div>
+                        <button
+                            class="hover:shadow-form rounded-md bg-[#6A64F1] py-3 px-8 text-base font-semibold text-white outline-none">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="posts mt-6">
+            <div class="text-4xl font-extrabold my-10 text-center">
+                <span class="bg-clip-text text-transparent  bg-gradient-to-r from-pink-500 to-violet-500">
+                    Your Posts
+                </span>
+            </div>
+            <div class="postcontainer flex gap-8 ">
+
+                <% user.posts.reverse().forEach(function(post){ %>
+
+                    <div class="relative flex w-96 flex-col rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
+                        <div class="p-6">
+                            <h5
+                                class="mb-2 block font-sans text-xl font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased">
+                                <%= post.title %>
+                            </h5>
+                            <p class="block font-sans text-base font-light leading-relaxed text-inherit antialiased">
+                                <%= post.content %>
+                            </p>
+                        </div>
+                        <div class="p-6 pt-0 flex justify-between">
+                        
+                            <a href="/like/<%= post._id %>" class="flex gap-3">
+
+                                <% if (post.likes.includes(user._id)) { %>
+                                    <i class="ri-heart-fill" style="color: red;"></i>
+                                <% } else { %>
+                                    <i class="ri-heart-line"></i>
+                                <% } %>
+
+                                
+                                <% if (post.likes.length === 1) { %>
+                                    <p>1 like</p>
+                                <% } else if (post.likes.length > 1) { %>
+                                    <p><%= post.likes.length %> likes</p>
+                                <% } %>
+                            </a>
+                            <div class="relative group">
+                                <button class="text-blue-gray-900 bg-sky-100 p-2 px-3 rounded-full shadow-md hover:bg-sky-200">
+                                    <i class="ri-more-2-fill"></i>
+                                </button>
+                                <div
+                                    class="absolute option-menu right-0 -mt-[110px] hidden w-32 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none group-hover:block">
+                                    <div class="py-1">
+                                        <a href="/edit/<%= post._id %>"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
+                                        <a href="/delete/<%= post._id %>"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <% }) %>
+
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var optionsButton = document.querySelector('.relative .btn-menu');
+            var optionsMenu = document.querySelector('.relative .option-menu');
+
+            optionsButton.addEventListener('mouseover', function () {
+                optionsMenu.classList.remove('hidden');
+            });
+
+            optionsButton.addEventListener('mouseout', function () {
+                optionsMenu.classList.add('hidden');
+            });
+
+            optionsMenu.addEventListener('mouseover', function () {
+                optionsMenu.classList.remove('hidden');
+            });
+
+            optionsMenu.addEventListener('mouseout', function () {
+                optionsMenu.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+
+</html>
