@@ -24,7 +24,6 @@ app.post('/upload', isLoggedIn, upload.single('file'), async (req, res) => {
     user.save();
 
     if (req.file) { 
-        console.log(req.file); 
         res.send('uploaded');
       } else {
         res.send('No file uploaded');
@@ -91,12 +90,10 @@ app.post('/post', isLoggedIn, async  (req, res) => {
 });
 
 app.post('/register', upload.single('file'), async (req, res) => {
-    console.log(req.body)
     let {username, name, email, age, password} = req.body;
     let user = await userModel.findOne({email});
     if(user) return res.status(500).send("User already registered")
     const hashPassword = bcrypt.hashSync(password, 10);
-    console.log(hashPassword)
 
     const newUser = await userModel.create({
         username,
