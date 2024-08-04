@@ -4,5 +4,6 @@ export const {
     APP_PORT,
     DEBUG_MODE,
     MONGO_URI,
-    JWT_KEY
+    JWT_KEY,
+    REFRESH_KEY
 } = process.env;

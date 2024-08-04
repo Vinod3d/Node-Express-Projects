@@ -1,3 +1,5 @@
 export {default as register} from './auth/registerController.js'
 export {default as login} from './auth/loginController.js'
 export {default as user} from './auth/userController.js'
+export {default as refreshcontroller} from './auth/refreshController.js'
+export {default as logout} from './auth/logoutController.js'

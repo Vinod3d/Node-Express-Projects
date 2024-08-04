@@ -2,32 +2,37 @@ import Joi from "joi";
 import { RefreshToken, User } from "../../models/index.js";
 import CustomErrorHandler from "../../services/CustomErrorHandler.js";
 import JwtService from "../../services/JwtService.js";
-import bcrypt from 'bcrypt';
 import { REFRESH_KEY } from "../../config/index.js";
 
-const login = async (req, res, next) => {
-    const { email, password } = req.body;
-    const loginSchema = Joi.object({
-        email: Joi.string().email().required(),
-        password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{4,8}$')).required(),
+const refreshcontroller = async (req, res, next)=>{
+    const refreshSchema = Joi.object({
+        refresh_token: Joi.string().required(),
     });
 
-    const { error } = loginSchema.validate(req.body);
+    const { error } = refreshSchema.validate(req.body);
 
     if (error) {
         return next(error);
     }
 
+    let userId;
+
     try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return next(CustomErrorHandler.wrongCredentials());
+        const refreshtoken = await RefreshToken.findOne({ token: req.body.refresh_token });
+        if (!refreshtoken) {
+            return next(CustomErrorHandler.unAuthorized('Invalid refresh token'));
+        }
+        
+        const {_id} = await JwtService.verify(refreshtoken.token, REFRESH_KEY)
+        userId = _id;
+
+        const user = await User.findOne({_id:userId});       
+        
+        if(!user){
+            return next(CustomErrorHandler.unAuthorized('No user found!'));
         }
 
-        const validatePassword = await bcrypt.compare(password, user.password);
-        if (!validatePassword) {
-            return next(CustomErrorHandler.wrongCredentials());
-        }
+
 
         const access_token = JwtService.sign({ _id: user._id, role: user.role });
         const refresh_token = JwtService.sign({_id: user._id, role: user.role}, REFRESH_KEY, '1y', )
@@ -40,9 +45,10 @@ const login = async (req, res, next) => {
         });
     
         return res.status(201).json({ access_token, refresh_token, message: "You logged in successfully" });
+
     } catch (error) {
-        return next(error);
+        return next(new Error('Something went wrong: ' + error.message)); 
     }
 }
 
-export default login;
+export default refreshcontroller
