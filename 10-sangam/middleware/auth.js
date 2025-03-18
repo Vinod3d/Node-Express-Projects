@@ -1,22 +1,23 @@
-import { JWT_KEY } from "../config/Index.js";
-import { User } from "../models/userSchema.js";
-import CustomErrorHandler from "../services/CustomErrorHandler.js";
-import jwt from "jsonwebtoken";
+import jwt from"jsonwebtoken"
+import { JWT_SECRET_KEY } from "../config/Index.js";
 
-const auth = async (req, res, next) => {
-    const token = req.cookies.token; 
+const authMiddleware = (req, res, next)=>{
+    const authHeader = req.headers["authorization"];
 
-    if (!token) {
-        return next(CustomErrorHandler.unAuthorized("You Are Not logged in"));
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(403).json({ message: "Access denied" });
     }
+
+    const token = authHeader.split(" ")[1];
 
     try {
-        const user = jwt.verify(token, JWT_KEY);
-        req.user = await User.findOne({_id: user._id}); 
+        const verified = jwt.verify(token, JWT_SECRET_KEY);
+        console.log(verified);
+        req.user = verified;
         next();
     } catch (error) {
-        next(error);
+        res.status(401).json({ message: "Invalid token" });
     }
-};
+}
 
-export default auth;
+export default authMiddleware;

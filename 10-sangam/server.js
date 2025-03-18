@@ -3,6 +3,8 @@ import connectDB from './config/connectDB.js';
 import { MONGO_URI, PORT } from './config/Index.js';
 import errorHandler from './middleware/errorHandlers.js';
 import authRoutes from './routes/auth-routes.js'
+import homeRoutes from './routes/home-routes.js'
+import adminRoutes from './routes/admin-routes.js'
 
 const app = express();
 const port = PORT;
@@ -17,6 +19,8 @@ app.get('/', (req, res) => {
 
 // ROUTES
 app.use('/api/auth', authRoutes);
+app.use('/api/home', homeRoutes); 
+app.use('/api/admin', adminRoutes);
 app.use(errorHandler)
 const start = async () => {
     try {
