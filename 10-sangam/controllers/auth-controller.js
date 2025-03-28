@@ -67,3 +67,28 @@ export const loginUser = async (req, res, next)=>{
         return next(CustomErrorHandler.serverError("Some error occured, please try again"))
     }
 } 
+
+
+export const changePassword = async(req, res, next)=>{
+    try {
+        const userId = req.user.userId;
+        const {oldPassword, newPassword} = req.body;
+        const user = await User.findById(userId);
+        if(!user){
+            return next(CustomErrorHandler.badRequest("Invalid user"))
+        }
+        const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
+        if(!isPasswordMatch){
+            return next(CustomErrorHandler.badRequest("Invalid old password"));
+        }
+
+        user.password = newPassword;
+        await user.save();
+        res.status(200).json({
+            success: true,
+            message: "Password changed successfully",
+        })
+    } catch (error) {
+        return next(CustomErrorHandler.serverError("Some error occured, please try again"))
+    }
+}

@@ -1,41 +1,43 @@
-class CustomErrorHandler extends Error{
-    constructor(status, msg){
-        super();
+class CustomErrorHandler extends Error {
+    constructor(status, message) {
+        super(message);
         this.status = status;
-        this.message = msg;
     }
 
-    static alreadyExist(message){
-        return new CustomErrorHandler(409, message);
+    static create(status, message) {
+        return new CustomErrorHandler(status, message);
     }
 
-    static wrongCredentials(message = "Username or password is wrong!"){
-        return new CustomErrorHandler(401, message);
+    static alreadyExist(message) {
+        return this.create(409, message);
     }
 
-    static unAuthorized(message = "unAuthorized"){
-        return new CustomErrorHandler(401, message);
+    static wrongCredentials(message = "Username or password is wrong!") {
+        return this.create(401, message);
     }
 
-    static notFound(message = "404 Not Found"){
-        return new CustomErrorHandler(404, message);
+    static unAuthorized(message = "Unauthorized Access") {
+        return this.create(403, message);
+    }
+
+    static notFound(message = "404 Not Found") {
+        return this.create(404, message);
     }
 
     static badRequest(message = "Bad Request") {
-        return new CustomErrorHandler(400, message);
+        return this.create(400, message);
     }
 
-    // This error applies when a user is authenticated but doesn’t have permission to access the resource.
     static forbidden(message = "Forbidden") {
-        return new CustomErrorHandler(403, message);
+        return this.create(403, message);
     }
 
     static serverError(message = "Internal Server Error") {
-        return new CustomErrorHandler(500, message);
+        return this.create(500, message);
     }
 
     static validationError(message = "Validation Error") {
-        return new CustomErrorHandler(422, message);
+        return this.create(422, message);
     }
 }
 
