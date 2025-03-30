@@ -29,13 +29,45 @@
         const messageInput = document.getElementById('message-input');
         const chat = document.getElementById('chat');
 
-        const userName = prompt('Enter your username');
-        socket.emit('join', userName);
+        const userName = prompt('Enter your username')?.trim();
+
+        // Ensure userName is valid
+        if (!userName) {
+            alert("Username is required!");
+            location.reload(); // Reload the page to prompt again
+        } else {
+            socket.emit('join', userName);
+        }
+
+
         socket.on("userJoined", (user)=>{
             addMessage(`${user} has joined the chat`);
         })
 
-        socket
+        socket.on('userLeft', (user)=>{
+            addMessage(`${user} has left the chat`);
+        })
+
+        socket.on("userList", (users)=>{
+            usersList.innerHTML = users.map((user)=> `<li>${user}</li>`).join("");
+        })
+
+        socket.on("chatMessage", (message)=>{
+            addMessage(`${message.userName}: ${message.text}`)
+        });
+
+
+
+        messageForm.addEventListener('submit', (event)=>{
+            event.preventDefault();
+            const extractMessageText = messageInput.value.trim();
+            if(extractMessageText){
+                socket.emit('chatMessage', {
+                    userName, text: extractMessageText
+                })
+                messageInput.value = "";
+            }
+        })
 
         function addMessage(input){
             const messageElement = document.createElement('div');
